@@ -1,0 +1,21 @@
+AIOS Dev Adapters — Spec v0.1
+Goal: Let any AIOS-* library (UIStyles, SimElite, AIOS_AI) expose debug/metrics to the Dev Suite.
+
+Handshake:
+- Library calls: AIOS.DevSuite:RegisterAdapter(name, adapterTable)
+- Or emit: Signal "AIOS_DEV_ADAPTER_READY" with (name, adapterTable)
+
+adapterTable fields (all optional; safe pcall wrapping):
+- :GetPanel(parent) -> Frame  (return a frame to be hosted in a DevSuite tab)
+- :GetSummary() -> string     (short one-line status for dashboard)
+- :RunSelfTest()              (return true/false, optional err text)
+- :Export() -> string         (text dump; goes to CopyBox)
+- :ListMetrics() -> table     (key->value map for dashboard table)
+- :OnEnable() / :OnDisable()  (lifecycle when suite opens/closes)
+- :Commands() -> table        ({label="Start GC", onClick=function() ... end}, ...)
+
+Suite wiring idea (future):
+- DevSuite shows tabs per adapter.
+- Each tab lazy-requests :GetPanel(parent), places it; shows Commands as buttons.
+- DevSuite collects summaries/metrics into the dashboard.
+- Anything without a panel still contributes to dashboards and exports.

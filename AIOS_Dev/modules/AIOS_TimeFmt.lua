@@ -1,0 +1,12 @@
+--[[ AIOS_TimeFmt.lua v1.0 ]]--
+local _G=_G; AIOS=_G.AIOS or {}; local SCHEMA="CoreDebugFmt"; local defaults={ts="seconds"}; local baseEpoch=nil
+local function compute_base() if _G.time and _G.GetTime then baseEpoch=_G.time()-_G.GetTime() else baseEpoch=nil end end; compute_base()
+local function dlog(m) if AIOS and AIOS.Debug and AIOS.Debug.Log then AIOS.Debug:Log("debug","TimeFmt",m) end end
+local function ensure_schema() local SV=AIOS and AIOS.Saved; if SV and SV.RegisterSchema then pcall(function() SV:RegisterSchema(SCHEMA, defaults, {scope="profile", version=1}) end) end end
+local function get_mode() local SV=AIOS and AIOS.Saved; if SV and SV.Get then return SV:Get(SCHEMA,"ts") or defaults.ts end return defaults.ts end
+local function set_mode(mode) local SV=AIOS and AIOS.Saved; if SV and SV.Set then SV:Set(SCHEMA,"ts",mode); dlog("Timestamp mode -> "..tostring(mode)) end end
+local function seconds_to_clock(sec) if not (baseEpoch and _G.date) then return nil end local ip=math.floor(sec); local frac=sec-ip; local epoch=baseEpoch+ip; local hhmmss=_G.date("%H:%M:%S", epoch); local mmm=math.floor(frac*1000+0.5); return string.format("%s.%03d", hhmmss, mmm) end
+local function rewrite_export_text(text) if get_mode()~="clock" then return text end local out={} for line in tostring(text or ""):gmatch("([^\n]*)\n?") do if line=="" then out[#out+1]="" else local pre,ts,post=line:match("^()%[(%d+%.%d+)%]()"); if ts then local sec=tonumber(ts); local clk=seconds_to_clock(sec); if clk then line="["..clk.."]"..line:sub(post) end end out[#out+1]=line end end return table.concat(out,"\n") end
+local function patch_export() if not AIOS or not AIOS.Debug then return end if AIOS.Debug._exportPatched then return end local D=AIOS.Debug; local orig=D.Export; if type(orig)~="function" then return end D._exportPatched=true; D.Export=function(self, ...) local text=orig(self, ...); return rewrite_export_text(text) end dlog("Patched Debug.Export for clock-time rewriting") end
+local f=CreateFrame("Frame"); f:RegisterEvent("ADDON_LOADED"); f:RegisterEvent("PLAYER_LOGIN"); f:SetScript("OnEvent", function(_,evt) if evt=="ADDON_LOADED" then ensure_schema(); patch_export() elseif evt=="PLAYER_LOGIN" then compute_base(); patch_export() end end)
+_G.SLASH_AIOSTS1="/aiosts"; SlashCmdList["AIOSTS"]=function(msg) local v=tostring(msg or ""):lower(); if v=="clock" or v=="seconds" then set_mode(v); if AIOS.Debug and AIOS.Debug._frame and AIOS.Debug._frame:IsShown() then AIOS.Debug:RefreshView() end else dlog("Usage: /aiosts seconds|clock") end end

@@ -1,0 +1,9 @@
+--[[ AIOS_DebugGlue.lua v1.0 ]]--
+local _G=_G; AIOS=_G.AIOS or {}; local D=nil; local SV=nil; local defaults={enabled=false,level="info",buffer=800}; local schema="CoreDebug"
+local function log(m) if AIOS and AIOS.Debug and AIOS.Debug.Log then AIOS.Debug:Log("debug","DbgGlue",m) end end
+local function register_schema() if not AIOS or not AIOS.Saved or not AIOS.Saved.RegisterSchema then return end SV=AIOS.Saved; pcall(function() SV:RegisterSchema(schema, defaults, {scope="profile", version=1}) end) end
+local function apply_settings() D=AIOS and AIOS.Debug; SV=AIOS and AIOS.Saved; if not (D and SV and SV.Get) then return end local enabled=SV:Get(schema,"enabled"); if enabled==nil then enabled=defaults.enabled end local level=SV:Get(schema,"level") or defaults.level local buffer=tonumber(SV:Get(schema,"buffer")) or defaults.buffer if enabled then D:Enable() else D:Disable() end D:SetLevel(level); D._max=buffer; log("Applied debug settings: enabled="..tostring(enabled).." level="..tostring(level).." buffer="..tostring(buffer)) end
+local function save_settings() D=AIOS and AIOS.Debug; SV=AIOS and AIOS.Saved; if not (D and SV and SV.Set) then return end local enabled=D:IsEnabled() local level=D:GetLevel() or "info" local buffer=tonumber(D._max or 800) or 800 SV:Set(schema,"enabled",enabled); SV:Set(schema,"level",level); SV:Set(schema,"buffer",buffer); log("Saved debug settings") end
+local f=CreateFrame("Frame"); f:RegisterEvent("ADDON_LOADED"); f:RegisterEvent("PLAYER_LOGIN"); f:RegisterEvent("PLAYER_LOGOUT"); f:SetScript("OnEvent",function(_,evt) if evt=="ADDON_LOADED" then register_schema() elseif evt=="PLAYER_LOGIN" then apply_settings() elseif evt=="PLAYER_LOGOUT" then save_settings() end end)
+if AIOS and AIOS.SignalHub and AIOS.SignalHub.Listen then AIOS.SignalHub:Listen("AIOS_Core_Ready", function() register_schema(); apply_settings() end) end
+AIOS.DebugGlue={Apply=apply_settings, Save=save_settings}

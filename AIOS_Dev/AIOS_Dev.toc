@@ -1,0 +1,20 @@
+## Interface: 110200
+## Title: AIOS Dev Tools
+## Notes: Developer tools for AIOS (loads on demand)
+## Author: AIOS
+## Version: 1.2
+## LoadOnDemand: 1
+## RequiredDeps: AIOS
+
+modules/AIOS_Debug.lua
+modules/AIOS_QATester.lua
+modules/AIOS_SignalTracer.lua
+modules/AIOS_MicroBench.lua
+modules/AIOS_DebugGlue.lua
+modules/AIOS_TraceGlue.lua
+modules/AIOS_TimeFmt.lua
+modules/AIOS_TraceProbe.lua
+modules/AIOS_DevControls.lua
+modules/AIOS_DevShell.lua
+modules/AIOS_SVInspector.lua
+modules/AIOS_ErrorCatcher.lua

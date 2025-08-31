@@ -1,0 +1,4 @@
+--[[ AIOS_TraceProbe.lua v1.0 ]]--
+local _G=_G; AIOS=_G.AIOS or {}; local function emit(evt, ...) if AIOS and AIOS.EventBus and AIOS.EventBus.Emit then AIOS.EventBus:Emit(evt, ...) return true elseif AIOS and AIOS.SignalHub and AIOS.SignalHub.Emit then AIOS.SignalHub:Emit(evt, ...) return true end return false end
+local f=CreateFrame("Frame"); f:RegisterEvent("PLAYER_LOGIN"); f:SetScript("OnEvent", function() C_Timer.After(0.05, function() emit("TRACE_DEMO","login",1) end); C_Timer.After(0.25, function() emit("TRACE_DEMO","login",2) end) end)
+_G.SLASH_AIOSTRACEPROBE1="/aiostraceprobe"; SlashCmdList["AIOSTRACEPROBE"]=function() emit("TRACE_DEMO","manual",1); C_Timer.After(0.05,function() emit("TRACE_DEMO","manual",2) end); C_Timer.After(0.10,function() emit("TRACE_DEMO","manual",3) end) end
