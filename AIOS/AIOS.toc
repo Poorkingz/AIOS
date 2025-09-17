@@ -1,0 +1,31 @@
+## Interface: 110205, 11507, 50500, 40400
+## Title: |cff00aaffAIOS|r  
+## Notes: |cff00aaffArtificial Intelligence Operating System - kernel + core data|r
+## Author: |cffffffffPoorkingz|r
+## Version: |cff00ff00v1.0|r
+## SavedVariables: AIOS_Saved
+## DefaultState: enabled
+## LoadOnDemand: 0
+## IconTexture: Interface\AddOns\AIOS\icon.tga
+
+
+core/AIOS_Core.lua
+modules/AIOS_Utils.lua
+modules/AIOS_ServiceRegistry.lua
+modules/AIOS_ConfigCore.lua
+modules/AIOS_Logger.lua
+modules/AIOS_Timers.lua
+modules/AIOS_EventBus.lua
+modules/AIOS_ModuleLoader.lua
+modules/AIOS_Serializer.lua
+modules/AIOS_Codec.lua
+modules/AIOS_Saved.lua
+modules/AIOS_Lean.lua
+modules/AIOS_Version.lua
+modules/AIOS_Locale.lua
+modules/AIOS_MediaCore.lua
+modules/AIOS_RuntimeProfile.lua
+modules/AIOS_Console.lua
+
+
+
